@@ -14,7 +14,7 @@ export default function Navbar() {
             <div className="flex gap-6 ml-30">
                 <Link to="/" className="hover:text-blue-600">Inicio</Link>
                 <Link to="/destinos" className="hover:text-blue-600">Destinos</Link>
-                <Link to="/login" className="hover:text-blue-600">Iniciar Sesion</Link>
+                <Link to="/auth" className="hover:text-blue-600">Iniciar Sesion</Link>
             </div>
         </nav>
     </header>
