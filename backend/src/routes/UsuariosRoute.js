@@ -1,8 +1,13 @@
-import { getUsuarios } from "../controller/UsuariosController.js";
+import { getUsuarios, register, login } from "../controller/UsuariosController.js";
 import express from "express";
 
 const router = express.Router();
 
-router.get('/usuarios', getUsuarios)
+// Ruta existente
+router.get('/usuarios', getUsuarios);
 
-export default router
+// NUEVAS RUTAS PARA AUTH
+router.post('/register', register); // Esto crea: /api/register
+router.post('/login', login);       // Esto crea: /api/login
+
+export default router;
