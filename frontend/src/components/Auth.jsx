@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 import './Auth.css';
 
 const BackIcon = () => (
@@ -32,49 +33,45 @@ const AuthLayout = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // src/pages/Auth.jsx (o donde tengas el componente)
+    // src/pages/Auth.jsx
 
 const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Definimos la URL completa de forma clara
-    // Asegúrate de que coincida con tu backend (localhost:4000/api/auth/...)
-    const baseUrl = 'http://localhost:4000/api/auth';
-    const endpoint = isLogin ? `${baseUrl}/login` : `${baseUrl}/register`;
+    // Definimos la URL base para no repetir
+    const url = `http://localhost:4000/api/auth/${isLogin ? 'login' : 'register'}`;
 
     try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        });
+        
+        const response = await axios.post(url, formData);
+        
+        
+        const data = response.data;
 
-        const data = await response.json();
-
-        // 2. Primero verificamos si la respuesta del servidor NO fue exitosa (401, 404, 500, etc)
-        if (!response.ok) {
-            // Aquí atrapará el "Contraseña incorrecta" del backend (Status 401)
-            alert(data.error || "Hubo un problema con la solicitud");
-            return; // Detenemos la ejecución aquí
-        }
-
-        // 3. Si llegamos aquí, la respuesta es exitosa (Status 200 o 201)
+        // status fue 2xx (Éxito)
         if (isLogin) {
-            // Lógica de Login exitoso
             console.log("Login correcto:", data);
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
             navigate('/'); 
         } else {
-            // Lógica de Registro exitoso
             alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
-            setIsLogin(true); // Cambiamos a modo login
-            setFormData({ nombre: '', email: '', password: '' }); // Limpiamos el form
+            setIsLogin(true);
+            setFormData({ nombre: '', email: '', password: '' });
         }
 
     } catch (error) {
-        console.error("Error de conexión:", error);
-        alert("No se pudo conectar con el servidor. Revisa que el backend esté encendido.");
+        // catch cualquier respuesta que no sea 2xx (401, 404, 500, etc.)
+        if (error.response) {
+            // El servidor respondió con un error
+            alert(error.response.data.error || "Hubo un problema con la solicitud");
+        } else if (error.request) {
+            // La petición se hizo pero no hubo respuesta
+            alert("No se pudo conectar con el servidor. Revisa que el backend esté encendido.");
+        } else {
+            // Error al configurar la petición
+            console.error("Error:", error.message);
+        }
     }
 };
 

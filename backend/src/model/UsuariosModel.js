@@ -19,7 +19,7 @@ const crearUsuario = async (nombre, email, password) => {
             .input('nombre', sql.VarChar, nombre)
             .input('email', sql.VarChar, email)
             .input('password', sql.VarChar, password)
-            // Asegúrate de que este procedimiento almacenado exista en tu SQL Server
+            // procedimiento almacenado exista en el SQL Server
             .execute('spRegistrarUsuario'); 
         return result;
     } catch (error) {
