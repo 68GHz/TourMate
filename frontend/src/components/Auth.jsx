@@ -32,37 +32,51 @@ const AuthLayout = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // Usamos el puerto 4000 que es el común para Node.js
-        const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+    // src/pages/Auth.jsx (o donde tengas el componente)
 
-        try {
-            const response = await fetch(`http://localhost:4000${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
+const handleSubmit = async (e) => {
+    e.preventDefault();
 
-            const data = await response.json();
+    // 1. Definimos la URL completa de forma clara
+    // Asegúrate de que coincida con tu backend (localhost:4000/api/auth/...)
+    const baseUrl = 'http://localhost:4000/api/auth';
+    const endpoint = isLogin ? `${baseUrl}/login` : `${baseUrl}/register`;
 
-            if (response.ok) {
-                if (isLogin) {
-                    localStorage.setItem('token', data.token);
-                    navigate('/'); 
-                } else {
-                    alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
-                    setIsLogin(true);
-                    setFormData({ nombre: '', email: '', password: '' }); // Limpiar form
-                }
-            } else {
-                alert(data.error || "Algo salió mal");
-            }
-        } catch (error) {
-            console.error("Error de conexión:", error);
-            alert("No se pudo conectar con el servidor.");
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        // 2. Primero verificamos si la respuesta del servidor NO fue exitosa (401, 404, 500, etc)
+        if (!response.ok) {
+            // Aquí atrapará el "Contraseña incorrecta" del backend (Status 401)
+            alert(data.error || "Hubo un problema con la solicitud");
+            return; // Detenemos la ejecución aquí
         }
-    };
+
+        // 3. Si llegamos aquí, la respuesta es exitosa (Status 200 o 201)
+        if (isLogin) {
+            // Lógica de Login exitoso
+            console.log("Login correcto:", data);
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            navigate('/'); 
+        } else {
+            // Lógica de Registro exitoso
+            alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
+            setIsLogin(true); // Cambiamos a modo login
+            setFormData({ nombre: '', email: '', password: '' }); // Limpiamos el form
+        }
+
+    } catch (error) {
+        console.error("Error de conexión:", error);
+        alert("No se pudo conectar con el servidor. Revisa que el backend esté encendido.");
+    }
+};
 
     return (
         <div className="auth-outer-wrapper">

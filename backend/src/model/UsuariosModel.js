@@ -28,4 +28,19 @@ const crearUsuario = async (nombre, email, password) => {
     }
 };
 
-export { listarUsuarios, crearUsuario };
+const buscarUsuarioPorEmail = async (email) => {
+    try {
+        const pool = await poolConnection;
+        const result = await pool.request()
+            .input('email', sql.VarChar, email)
+            .execute('spBuscarUsuarioPorEmail');
+        
+        // Retornamos el primer registro si existe
+        return result.recordset[0]; 
+    } catch (error) {
+        console.error('Error al buscar usuario:', error);
+        throw error;
+    }
+};
+
+export { listarUsuarios, crearUsuario, buscarUsuarioPorEmail };
