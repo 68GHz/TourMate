@@ -235,3 +235,23 @@
 .primary-submit-btn:hover {
   background-color: #3a85ae;
 }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .auth-card-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .auth-carousel {
+    height: 220px;
+  }
+
+  .auth-form-section {
+    padding: 20px;
+  }
+
+  .form-body {
+    max-width: 100%;
+  }
+}

@@ -1,20 +1,24 @@
+import React from 'react'
 import { useState } from 'react'
-import Home from './pages/Home'
-import Auth from './components/Auth'
-import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './context/auth-context.jsx'
+import Header from './components/Navbar'
+import Home from './pages/Home'
+import AuthLayout from './components/Auth'
+import './App.css'
 
 function App() {
 
   return (
-    <BrowserRouter>
-    
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/auth" element={<Auth />} />
-      </Routes>
-
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/auth" element={<AuthLayout />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

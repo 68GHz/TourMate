@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/auth-context.jsx';
 import axios from 'axios';
 import './Auth.css';
 
@@ -10,7 +11,10 @@ const BackIcon = () => (
     </svg>
 );
 
+const IMAGES_CAROUSEL = ['/about1.jpg', '/about2.jpg', '/about3.jpg'];
+
 const AuthLayout = () => {
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     // --- ESTADOS ---
@@ -18,15 +22,13 @@ const AuthLayout = () => {
     const [currentImage, setCurrentImage] = useState(0);
     const [formData, setFormData] = useState({ nombre: '', email: '', password: '' });
 
-    const images = ['/about1.jpg', '/about2.jpg', '/about3.jpg'];
-
     // --- EFECTOS ---
     useEffect(() => {
         const timer = setInterval(() => {
-            setCurrentImage((prev) => (prev + 1) % images.length);
+            setCurrentImage((prev) => (prev + 1) % IMAGES_CAROUSEL.length);
         }, 5000);
         return () => clearInterval(timer);
-    }, [images.length]);
+    }, []);
 
     // --- MANEJADORES ---
     const handleChange = (e) => {
@@ -44,18 +46,15 @@ const handleSubmit = async (e) => {
     try {
         
         const response = await axios.post(url, formData);
-        
-        
         const data = response.data;
 
         // status fue 2xx (Éxito)
         if (isLogin) {
-            console.log("Login correcto:", data);
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-            navigate('/'); 
+            login(data.user, data.token);
+            navigate('/')
+            console.log('Login exitoso')
         } else {
-            alert("¡Registro exitoso! Ahora puedes iniciar sesión.");
+            alert("Registro exitoso. Ahora puedes iniciar sesión.");
             setIsLogin(true);
             setFormData({ nombre: '', email: '', password: '' });
         }
@@ -90,11 +89,11 @@ const handleSubmit = async (e) => {
                         <Link to="/" className="back-home-btn">
                             <BackIcon /><span>Volver al Home</span>
                         </Link>
-                        <img src={images[currentImage]} alt="TourMate" className="carousel-image"/>
+                        <img src={IMAGES_CAROUSEL[currentImage]} alt="TourMate" className="carousel-image"/>
                         <div className="carousel-overlay">
                             <h2>Capturando Momentos,<br/>Creando Recuerdos</h2>
                             <div className="pagination-dots">
-                                {images.map((_, index) => (
+                                {IMAGES_CAROUSEL.map((_, index) => (
                                     <button 
                                         key={index}
                                         className={`dot ${index === currentImage ? 'active' : ''}`}
